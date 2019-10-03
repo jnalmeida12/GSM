@@ -32,10 +32,9 @@ SASR	= -DSASR
 # CC		= /usr/lang/acc
 # CCFLAGS 	= -c -O0 -
 
-CC		= arm-linux-gnueabi-gcc -ansi -pedantic -static 
-# ARM gcc doesn't like the -O1 here...
+CC		= arm-linux-gnueabi-gcc -ansi -pedantic -static
 #CCFLAGS 	= -c -O1 -DSTUPID_COMPILER -DNeedFunctionPrototypes=1
-CCFLAGS 	= -c -DSTUPID_COMPILER -DNeedFunctionPrototypes=1 -O3 -mfloat-abi=softfp -mfpu=neon -march=armv7-a -mtune=cortex-a8 -opt
+CCFLAGS 	= -c -DSTUPID_COMPILER -DNeedFunctionPrototypes=1 -O3 -mfloat-abi=softfp -mfpu=neon -march=armv7-a -mtune=cortex-a8 -fno-tree-vectorize
 
 
 
@@ -126,7 +125,7 @@ INC	= $(ROOT)/inc
 # DEBUG	= -DNDEBUG
 ######### Remove -DNDEBUG to enable assertions.
 
-CFLAGS	= $(CCFLAGS) $(SASR) $(DEBUG) $(MULHACK) $(FAST) $(CCINC) -I$(INC)
+CFLAGS	= $(CCFLAGS) $(SASR) $(DEBUG) $(MULHACK) $(FAST) $(CCINC) -I$(INC) 
 ######### It's $(CC) $(CFLAGS)
 
 LFLAGS	= $(LDFLAGS) $(LDINC)
@@ -300,15 +299,15 @@ $(LIBGSM):	$(LIB) $(GSM_OBJECTS)
 # Toast, Untoast and Tcat -- the compress-like frontends to gsm.
 
 $(TOAST):	$(BIN) $(TOAST_OBJECTS) $(LIBGSM)
-		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSM) $(LDLIB)
+		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSM) $(LDLIB) -lm
 
 $(UNTOAST):	$(BIN) $(TOAST)
 		-rm $(RMFLAGS) $(UNTOAST)
-		$(LN) $(TOAST) $(UNTOAST)
+		$(LN) $(TOAST) $(UNTOAST) -lm
 
 $(TCAT):	$(BIN) $(TOAST)
 		-rm $(RMFLAGS) $(TCAT)
-		$(LN) $(TOAST) $(TCAT)
+		$(LN) $(TOAST) $(TCAT) -lm
 
 
 # The local bin and lib directories

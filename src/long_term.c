@@ -8,13 +8,14 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #include "private.h"
 
 #include "gsm.h"
 #include "proto.h"
 
-#ifdef opt
+#ifdef optm
 #include <arm_neon.h>
 #endif
 
@@ -88,6 +89,10 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	word		R, S, dmax, scal;
 	register word	temp;
 
+	#ifdef optm
+	int16x8_t tmpr, acc;
+	#endif
+
 	/*  Search of the optimum scaling of d[0..39].
 	 */
 	dmax = 0;
@@ -113,13 +118,12 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	/*  Initialization of a working array wt
 	 */
 	/*LOOPDEF=count vec*/
-	#ifdef opt
-	int16x8_t temp;
-
-	for(k = 0; k < 5; k++){
-		temp = vld1q_s16(d[k]);
-		vshr_n_s16(temp, scal);
-		vst1q_s16(wt[k],temp);
+	#ifdef optm
+	for(k = 0; k < 39; k+=8){
+		tmpr = vld1q_s16(&d[k]);
+		tmpr = vmulq_n_s16(tmpr, 1/pow(2, scal));
+		/*tmpr = vshrq_n_s16(tmpr, scal);*/
+		vst1q_s16(&wt[k],tmpr);
 	}
 	#else
 	for (k = 0; k <= 39; k++) wt[k] = SASR( d[k], scal );
@@ -185,15 +189,13 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	 */
 	L_power = 0;
 	/*LOOPDEF=count vec*/
-	#ifdef opt
-	int32x4_t temp, acc;
-	
-	for (k = 0; k < 10;k++){
-		temp = vld1q_s32(dp[k-Nc]);
-		vshrq_n_s32(temp, 3);
-		vmlaq_s32(acc, temp, temp);
-		L_power += acc[0] + acc[1] + acc[2] + acc[3];
+	#ifdef optm
+	for (k = 0; k < 39;k+=4){
+		tmpr = vld1q_s16(&dp[k-Nc]);
+		tmpr = vshrq_n_s16(tmpr, 3);
+		acc = vmlaq_s16(acc, tmpr, tmpr);
 	}
+	L_power += acc[0] + acc[1] + acc[2] + acc[3];
 	#else
 	for (k = 0; k <= 39; k++) {
 		register longword L_temp;
