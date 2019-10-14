@@ -189,12 +189,12 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	L_power = 0;
 	/*LOOPDEF=count vec*/
 	#ifdef optm
-	for (k = 0; k < 39;k+=4){
+	for (k = 0; k < 39;k+=8){
 		tmpr = vld1q_s16(&dp[k-Nc]);
 		tmpr = vshrq_n_s16(tmpr, 3);
 		acc = vmlaq_s16(acc, tmpr, tmpr);
 	}
-	L_power += acc[0] + acc[1] + acc[2] + acc[3];
+	L_power += acc[0] + acc[1] + acc[2] + acc[3] + acc[4] + acc[5] + acc[6] + acc[7];
 	#else
 	for (k = 0; k <= 39; k++) {
 		register longword L_temp;

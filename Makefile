@@ -34,7 +34,7 @@ SASR	= -DSASR
 
 CC		= arm-linux-gnueabi-gcc -ansi -pedantic -static
 #CCFLAGS 	= -c -O1 -DSTUPID_COMPILER -DNeedFunctionPrototypes=1
-CCFLAGS 	= -c -DSTUPID_COMPILER -DNeedFunctionPrototypes=1 -O3 -mfloat-abi=softfp -mfpu=neon -march=armv7-a -mtune=cortex-a8 -fno-tree-vectorize
+CCFLAGS 	= -c -DSTUPID_COMPILER -DNeedFunctionPrototypes=1 -O3 -mfloat-abi=softfp -mfpu=neon -march=armv7-a -mtune=cortex-a8 -Doptm
 
 
 
