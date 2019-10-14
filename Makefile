@@ -299,15 +299,15 @@ $(LIBGSM):	$(LIB) $(GSM_OBJECTS)
 # Toast, Untoast and Tcat -- the compress-like frontends to gsm.
 
 $(TOAST):	$(BIN) $(TOAST_OBJECTS) $(LIBGSM)
-		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSM) $(LDLIB) -lm
+		$(LD) $(LFLAGS) -o $(TOAST) $(TOAST_OBJECTS) $(LIBGSM) $(LDLIB)
 
 $(UNTOAST):	$(BIN) $(TOAST)
 		-rm $(RMFLAGS) $(UNTOAST)
-		$(LN) $(TOAST) $(UNTOAST) -lm
+		$(LN) $(TOAST) $(UNTOAST)
 
 $(TCAT):	$(BIN) $(TOAST)
 		-rm $(RMFLAGS) $(TCAT)
-		$(LN) $(TOAST) $(TCAT) -lm
+		$(LN) $(TOAST) $(TCAT)
 
 
 # The local bin and lib directories

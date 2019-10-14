@@ -90,7 +90,7 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	register word	temp;
 
 	#ifdef optm
-	int16x8_t tmpr, acc;
+	int16x8_t tmpr, acc, v_scal;
 	#endif
 
 	/*  Search of the optimum scaling of d[0..39].
@@ -119,11 +119,11 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 	 */
 	/*LOOPDEF=count vec*/
 	#ifdef optm
+	v_scal = vdupq_n_s16(0-scal);
 	for(k = 0; k < 39; k+=8){
 		tmpr = vld1q_s16(&d[k]);
-		tmpr = vmulq_n_s16(tmpr, 1/pow(2, scal));
-		/*tmpr = vshrq_n_s16(tmpr, scal);*/
-		vst1q_s16(&wt[k],tmpr);
+		tmpr = vshlq_s16(tmpr, v_scal);
+		vst1q_s16(&wt[k], tmpr); 
 	}
 	#else
 	for (k = 0; k <= 39; k++) wt[k] = SASR( d[k], scal );
@@ -142,7 +142,6 @@ static void Calculation_of_the_LTP_parameters P4((d,dp,bc_out,Nc_out),
 # else
 #		define STEP(k) (wt[k] * dp[k - lambda])
 # endif
-
 		register longword L_result;
 
 		L_result  = STEP(0)  ; L_result += STEP(1) ;
